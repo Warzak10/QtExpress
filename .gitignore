@@ -1,9 +1,4 @@
-# Prerequisites
-*.d
-
 # Compiled Object files
-*.slo
-*.lo
 *.o
 *.obj
 
@@ -12,21 +7,20 @@
 *.pch
 
 # Compiled Dynamic libraries
-*.so
-*.dylib
 *.dll
 
-# Fortran module files
-*.mod
-*.smod
-
 # Compiled Static libraries
-*.lai
-*.la
 *.a
 *.lib
 
-# Executables
+# Other files
 *.exe
-*.out
-*.app
+*.stash
+Makefile
+Makefile.Debug
+Makefile.Release
+*_plugin_import.cpp
+
+# Folders
+release/
+debug/

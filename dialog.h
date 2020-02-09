@@ -2,14 +2,15 @@
 #define DIALOG_H
 
 #include <QDialog>
+#include <QDir>
 
-QT_BEGIN_NAMESPACE
+class QComboBox;
+
 namespace Ui { class Dialog; }
-QT_END_NAMESPACE
 
 class Dialog : public QDialog
 {
-		Q_OBJECT
+	Q_OBJECT
 
 	public:
 		Dialog(QWidget *parent = nullptr);
@@ -17,5 +18,27 @@ class Dialog : public QDialog
 
 	private:
 		Ui::Dialog *ui;
+};
+
+//////////////////////////////////////////////////////////
+
+struct Item : public QObject
+{
+	Q_OBJECT
+
+	Item(QObject* parent);
+	virtual void createProject(const QDir& dir) = 0;
+};
+
+struct ConsoleAppItem : public Item
+{
+	ConsoleAppItem(QComboBox* box);
+	virtual void createProject(const QDir& dir);
+};
+
+struct WidgetsAppItem : public Item
+{
+	WidgetsAppItem(QComboBox* box);
+	virtual void createProject(const QDir& dir);
 };
 #endif // DIALOG_H
