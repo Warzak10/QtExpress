@@ -16,6 +16,7 @@
 # Other files
 *.exe
 *.stash
+*.autosave
 Makefile
 Makefile.Debug
 Makefile.Release

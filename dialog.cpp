@@ -4,6 +4,9 @@
 #include <QStandardPaths>
 #include <QSettings>
 #include <QDebug>
+#include <QTimer>
+#include <QFileDialog>
+#include <QDesktopServices>
 
 Dialog::Dialog(QWidget *parent) : QDialog(parent), ui(new Ui::Dialog)
 {
@@ -19,7 +22,7 @@ Dialog::Dialog(QWidget *parent) : QDialog(parent), ui(new Ui::Dialog)
 	QHash<QString, QString> qtVersions;
 	QFile versionsFile(settings->value("qtSettingsPath").toString()+"/qtversion.xml");
 	if(!versionsFile.open(QIODevice::ReadOnly)){qWarning()<<"Impossible d'ouvrir le fichier \"qtversion.xml\""; std::exit(EXIT_FAILURE);}
-	QByteArray VData = versionsFile.readAll();
+	QString VData = versionsFile.readAll();
 	versionsFile.close();
 
 	QRegularExpression rxv("Id\">(.+?).+?QMakePath\">.+?(\\d+\\.\\d+\\.\\d+).+?(Source\">(.+?)<.+)?Autodetected",QRegularExpression::DotMatchesEverythingOption);
@@ -34,7 +37,7 @@ Dialog::Dialog(QWidget *parent) : QDialog(parent), ui(new Ui::Dialog)
 	QHash<QString, QString> qtKits;
 	QFile kitsFile(settings->value("qtSettingsPath").toString()+"/profiles.xml");
 	if(!kitsFile.open(QIODevice::ReadOnly)){qWarning()<<"Impossible d'ouvrir le fichier \"profiles.xml\""; std::exit(EXIT_FAILURE);}
-	QByteArray KData = kitsFile.readAll();
+	QString KData = kitsFile.readAll();
 	kitsFile.close();
 
 	QRegularExpression rxk("QtInformation\">(.+?)<.+?Id\">(.+?)<.+?Name\">(.+?)<",QRegularExpression::DotMatchesEverythingOption);
@@ -47,16 +50,81 @@ Dialog::Dialog(QWidget *parent) : QDialog(parent), ui(new Ui::Dialog)
 	// UI SETUP //
 
 	ui->setupUi(this);
+	setWindowTitle(qApp->applicationDisplayName());
+	ui->directoryLineEdit->setText(settings->value("defaultProjectPath").toString());
+	ui->checkBox->setChecked(!ui->directoryLineEdit->text().isEmpty());
+
 	for(QString k : qtKits.keys()) ui->projectKitCombo->addItem(k, qtKits.value(k));
+	new ConsoleAppItem(ui->projectTypeCombo);
+	new WidgetsAppItem(ui->projectTypeCombo);
 
+	// CONNECTIONS
 
+	QTimer* t = new QTimer(this);
+	connect(t, &QTimer::timeout, [=]{ui->warningLabel->clear();});
 
+	connect(ui->browseButton, &QPushButton::clicked, [=]{
+		ui->directoryLineEdit->setText(QFileDialog::getExistingDirectory(this,qApp->applicationDisplayName(),qApp->applicationDirPath()));});
 
-	//std::exit(EXIT_FAILURE);
+	connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
+	connect(ui->buttonBox, &QDialogButtonBox::accepted, [=]{
+		if(ui->projectNameLineEdit->text().isEmpty()) {ui->warningLabel->setText("Le nom du projet ne peut pas etre vide"); t->start(2000);return;}
+		if(ui->directoryLineEdit->text().isEmpty()) {ui->warningLabel->setText("L'emplacement du projet ne peut pas etre vide"); t->start(2000);return;}
+		if(ui->projectNameLineEdit->text().contains(QRegExp("\\W+"))) {ui->warningLabel->setText("Le nom du projet est invalide"); t->start(2000);return;}
+		if(ui->directoryLineEdit->text().contains(QRegExp("[^\\w\\/\\\\:]+"))) {ui->warningLabel->setText("L'emplacement du projet est invalide"); t->start(2000);return;}
+
+		QDir dir(ui->directoryLineEdit->text()+QDir::separator()+ui->projectNameLineEdit->text());
+		if(dir.exists()) {ui->warningLabel->setText("Ce projet exist deja"); t->start(2000);return;}
+
+		settings->setValue("defaultProjectPath", ui->checkBox->isChecked() ? ui->directoryLineEdit->text() : "");
+
+		// Copy corresponding files
+		qvariant_cast<Item*>(ui->projectTypeCombo->currentData())->createProject(dir);
+
+		// Edit ".pro.user" file with QtKit selected
+		QFile userFile(dir.absolutePath()+QDir::separator()+dir.dirName()+".pro.user");
+		if(!userFile.open(QIODevice::ReadOnly)){qWarning()<<"Impossible d'ouvrir le fichier \""+userFile.fileName()+"\"" ; qApp->exit(EXIT_FAILURE);}
+		QString data = userFile.readAll(); userFile.close();
+
+		data.replace("ProjectConfiguration.Id\"><","ProjectConfiguration.Id\">"+ui->projectKitCombo->currentData().toString()+"<");
+
+		if(!userFile.open(QIODevice::WriteOnly|QIODevice::Truncate)){qWarning()<<"Impossible d'ouvrir le fichier \""+userFile.fileName()+"\"" ; qApp->exit(EXIT_FAILURE);}
+		userFile.write(data.toUtf8()); userFile.close();
+
+		// Open new project
+		QDesktopServices::openUrl(QUrl("file:///"+dir.absolutePath()+QDir::separator()+dir.dirName()+".pro"));
+
+		accept();});
 }
 
-Dialog::~Dialog()
+Dialog::~Dialog(){delete ui;}
+
+///////////////////////////////////////////////
+
+Item::Item(QObject* parent) : QObject(parent){}
+
+///////////////////////////////////////////////
+
+ConsoleAppItem::ConsoleAppItem(QComboBox* box) : Item(box) {box->addItem("Qt Console Application", QVariant::fromValue(this));}
+
+void ConsoleAppItem::createProject(const QDir& dir)
 {
-	delete ui;
+	dir.mkpath(dir.absolutePath());
+	QFile::copy("files\\console-main",dir.absolutePath()+QDir::separator()+"main.cpp");
+	QFile::copy("files\\console-pro",dir.absolutePath()+QDir::separator()+dir.dirName()+".pro");
+	QFile::copy("files\\common-pro-user",dir.absolutePath()+QDir::separator()+dir.dirName()+".pro.user");
 }
 
+//////////////////////////////////////////////
+
+WidgetsAppItem::WidgetsAppItem(QComboBox* box) : Item(box) {box->addItem("Qt Widgets Application", QVariant::fromValue(this));}
+
+void WidgetsAppItem::createProject(const QDir& dir)
+{
+	dir.mkpath(dir.absolutePath());
+	QFile::copy("files\\widgets-main",dir.absolutePath()+QDir::separator()+"main.cpp");
+	QFile::copy("files\\widgets-mainwindow-h",dir.absolutePath()+QDir::separator()+"mainwindow.h");
+	QFile::copy("files\\widgets-mainwindow-cpp",dir.absolutePath()+QDir::separator()+"mainwindow.cpp");
+	QFile::copy("files\\widgets-pro",dir.absolutePath()+QDir::separator()+dir.dirName()+".pro");
+	QFile::copy("files\\common-pro-user",dir.absolutePath()+QDir::separator()+dir.dirName()+".pro.user");
+}

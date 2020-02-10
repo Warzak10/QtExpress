@@ -25,7 +25,7 @@ class Dialog : public QDialog
 struct Item : public QObject
 {
 	Q_OBJECT
-
+	public:
 	Item(QObject* parent);
 	virtual void createProject(const QDir& dir) = 0;
 };

@@ -1,0 +1,21 @@
+#-------------------------------------------------
+#
+# Project created by QtCreator 2018-10-27T23:01:50
+#
+#-------------------------------------------------
+
+QT       += core gui widgets
+
+TARGET = sans_titre
+TEMPLATE = app
+
+DEFINES += QT_DEPRECATED_WARNINGS
+
+CONFIG += c++11
+
+SOURCES += \
+        main.cpp \
+        mainwindow.cpp
+
+HEADERS += \
+        mainwindow.h
