@@ -61,20 +61,41 @@ Dialog::Dialog(QWidget *parent) : QDialog(parent), ui(new Ui::Dialog)
 	// CONNECTIONS
 
 	QTimer* t = new QTimer(this);
-	connect(t, &QTimer::timeout, [=]{ui->warningLabel->clear();});
+	connect(t, &QTimer::timeout, [=]{
+		ui->warningLabel->clear();
+		ui->projectNameLineEdit->setStyleSheet("background-color: white;");
+		ui->directoryLineEdit->setStyleSheet("background-color: white;");});
+
 
 	connect(ui->browseButton, &QPushButton::clicked, [=]{
 		ui->directoryLineEdit->setText(QFileDialog::getExistingDirectory(this,qApp->applicationDisplayName(),qApp->applicationDirPath()));});
 
 	connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
 	connect(ui->buttonBox, &QDialogButtonBox::accepted, [=]{
-		if(ui->projectNameLineEdit->text().isEmpty()) {ui->warningLabel->setText("Le nom du projet ne peut pas etre vide"); t->start(2000);return;}
-		if(ui->directoryLineEdit->text().isEmpty()) {ui->warningLabel->setText("L'emplacement du projet ne peut pas etre vide"); t->start(2000);return;}
-		if(ui->projectNameLineEdit->text().contains(QRegExp("\\W+"))) {ui->warningLabel->setText("Le nom du projet est invalide"); t->start(2000);return;}
-		if(ui->directoryLineEdit->text().contains(QRegExp("[^\\w\\/\\\\:]+"))) {ui->warningLabel->setText("L'emplacement du projet est invalide"); t->start(2000);return;}
+
+		// Check user datas
+		if(ui->projectNameLineEdit->text().isEmpty()) {
+			ui->warningLabel->setText("Le nom du projet ne peut pas etre vide");
+			ui->projectNameLineEdit->setStyleSheet("background-color: LightCoral;");
+			t->start(2000);return;}
+		if(ui->directoryLineEdit->text().isEmpty()) {
+			ui->warningLabel->setText("L'emplacement du projet ne peut pas etre vide");
+			ui->directoryLineEdit->setStyleSheet("background-color: LightCoral;");
+			t->start(2000);return;}
+		if(ui->projectNameLineEdit->text().contains(QRegExp("\\W+"))) {
+			ui->warningLabel->setText("Le nom du projet est invalide");
+			ui->projectNameLineEdit->setStyleSheet("background-color: LightCoral;");
+			t->start(2000);return;}
+		if(ui->directoryLineEdit->text().contains(QRegExp("[^\\w\\/\\\\:]+"))) {
+			ui->warningLabel->setText("L'emplacement du projet est invalide");
+			ui->directoryLineEdit->setStyleSheet("background-color: LightCoral;");
+			t->start(2000);return;}
 
 		QDir dir(ui->directoryLineEdit->text()+QDir::separator()+ui->projectNameLineEdit->text());
-		if(dir.exists()) {ui->warningLabel->setText("Ce projet exist deja"); t->start(2000);return;}
+		if(dir.exists()) {
+			ui->warningLabel->setText("Ce projet exist deja");
+			ui->directoryLineEdit->setStyleSheet("background-color: LightCoral;");
+			t->start(2000);return;}
 
 		settings->setValue("defaultProjectPath", ui->checkBox->isChecked() ? ui->directoryLineEdit->text() : "");
 
