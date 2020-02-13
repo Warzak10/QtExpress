@@ -51,6 +51,7 @@ Dialog::Dialog(QWidget *parent) : QDialog(parent), ui(new Ui::Dialog)
 
 	ui->setupUi(this);
 	setWindowTitle(qApp->applicationDisplayName());
+	setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 	ui->directoryLineEdit->setText(settings->value("defaultProjectPath").toString());
 	ui->checkBox->setChecked(!ui->directoryLineEdit->text().isEmpty());
 
@@ -97,8 +98,6 @@ Dialog::Dialog(QWidget *parent) : QDialog(parent), ui(new Ui::Dialog)
 			ui->directoryLineEdit->setStyleSheet("background-color: LightCoral;");
 			t->start(2000);return;}
 
-		settings->setValue("defaultProjectPath", ui->checkBox->isChecked() ? ui->directoryLineEdit->text() : "");
-
 		// Copy corresponding files
 		qvariant_cast<Item*>(ui->projectTypeCombo->currentData())->createProject(dir);
 
@@ -115,6 +114,7 @@ Dialog::Dialog(QWidget *parent) : QDialog(parent), ui(new Ui::Dialog)
 		// Open new project
 		QDesktopServices::openUrl(QUrl("file:///"+dir.absolutePath()+QDir::separator()+dir.dirName()+".pro"));
 
+		settings->setValue("defaultProjectPath", ui->checkBox->isChecked() ? ui->directoryLineEdit->text() : "");
 		accept();});
 }
 
