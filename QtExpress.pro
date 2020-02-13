@@ -14,3 +14,10 @@ HEADERS += \
 
 FORMS += \
     dialog.ui
+
+RC_ICONS = icon.ico
+
+VERSION = 1.0
+QMAKE_TARGET_PRODUCT = $${TARGET}
+QMAKE_TARGET_DESCRIPTION = $${TARGET}
+
