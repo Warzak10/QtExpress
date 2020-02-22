@@ -83,11 +83,11 @@ Dialog::Dialog(QWidget *parent) : QDialog(parent), ui(new Ui::Dialog)
 			ui->warningLabel->setText("L'emplacement du projet ne peut pas etre vide");
 			ui->directoryLineEdit->setStyleSheet("background-color: LightCoral;");
 			t->start(2000);return;}
-		if(ui->projectNameLineEdit->text().contains(QRegExp("\\W+"))) {
+		if(!QRegExp("[\\w-]+").exactMatch(ui->projectNameLineEdit->text())) {
 			ui->warningLabel->setText("Le nom du projet est invalide");
 			ui->projectNameLineEdit->setStyleSheet("background-color: LightCoral;");
 			t->start(2000);return;}
-		if(ui->directoryLineEdit->text().contains(QRegExp("[^\\w\\/\\\\:]+"))) {
+		if(!QRegExp("\\w:[^:*?\"<>|]+").exactMatch(ui->directoryLineEdit->text())) {
 			ui->warningLabel->setText("L'emplacement du projet est invalide");
 			ui->directoryLineEdit->setStyleSheet("background-color: LightCoral;");
 			t->start(2000);return;}

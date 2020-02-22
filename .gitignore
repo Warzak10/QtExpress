@@ -2,10 +2,6 @@
 *.o
 *.obj
 
-# Precompiled Headers
-*.gch
-*.pch
-
 # Compiled Dynamic libraries
 *.dll
 
@@ -18,12 +14,15 @@ release/
 debug/
 
 # Other files
-*.exe
-*.stash
-*.autosave
 Makefile
 Makefile.Debug
 Makefile.Release
+ui_*.h
 *_plugin_import.cpp
+*.pro.user
+*.exe
+*.stash
+*.autosave
 *.rc
 *.lnk
+*.zip
