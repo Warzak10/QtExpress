@@ -1,3 +1,7 @@
+# Folders
+release/
+debug/
+
 # Compiled Object files
 *.o
 *.obj
@@ -9,20 +13,15 @@
 *.a
 *.lib
 
-# Folders
-release/
-debug/
-
-# Other files
-Makefile
-Makefile.Debug
-Makefile.Release
+# Build/Qt files
+Makefile*
 ui_*.h
 *_plugin_import.cpp
-*.pro.user
-*.exe
 *.stash
 *.autosave
+
+# Other files
+*.exe
 *.rc
 *.lnk
 *.zip

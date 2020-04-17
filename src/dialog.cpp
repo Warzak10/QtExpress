@@ -53,7 +53,7 @@ Dialog::Dialog(QWidget *parent) : QDialog(parent), ui(new Ui::Dialog)
 	setWindowTitle(qApp->applicationDisplayName());
 	setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 	ui->directoryLineEdit->setText(settings->value("defaultProjectPath").toString());
-	ui->checkBox->setChecked(!ui->directoryLineEdit->text().isEmpty());
+	ui->pathCheckBox->setChecked(!ui->directoryLineEdit->text().isEmpty());
 
 	for(QString k : qtKits.keys()) ui->projectKitCombo->addItem(k, qtKits.value(k));
 	new ConsoleAppItem(ui->projectTypeCombo);
@@ -92,29 +92,33 @@ Dialog::Dialog(QWidget *parent) : QDialog(parent), ui(new Ui::Dialog)
 			ui->directoryLineEdit->setStyleSheet("background-color: LightCoral;");
 			t->start(2000);return;}
 
-		QDir dir(ui->directoryLineEdit->text()+QDir::separator()+ui->projectNameLineEdit->text());
-		if(dir.exists()) {
+		QDir projectDir(ui->directoryLineEdit->text()+QDir::separator()+ui->projectNameLineEdit->text());
+		if(projectDir.exists()) {
 			ui->warningLabel->setText("Ce projet exist deja");
 			ui->directoryLineEdit->setStyleSheet("background-color: LightCoral;");
 			t->start(2000);return;}
 
+		QDir srcDir(ui->srcCheckBox->isChecked() ? projectDir.absolutePath()+QDir::separator()+"src" : projectDir);
+
 		// Copy corresponding files
-		qvariant_cast<Item*>(ui->projectTypeCombo->currentData())->createProject(dir);
+
+		qvariant_cast<Item*>(ui->projectTypeCombo->currentData())->createProject(srcDir);
 
 		// Edit ".pro.user" file with QtKit selected
-		QFile userFile(dir.absolutePath()+QDir::separator()+dir.dirName()+".pro.user");
+		QFile userFile(srcDir.absolutePath()+QDir::separator()+srcDir.dirName()+".pro.user");
 		if(!userFile.open(QIODevice::ReadOnly)){qWarning()<<"Impossible d'ouvrir le fichier \""+userFile.fileName()+"\"" ; qApp->exit(EXIT_FAILURE);}
 		QString data = userFile.readAll(); userFile.close();
 
-		data.replace("ProjectConfiguration.Id\"><","ProjectConfiguration.Id\">"+ui->projectKitCombo->currentData().toString()+"<");
+		data.replace("ProjectConfiguration.Id\">","ProjectConfiguration.Id\">"+ui->projectKitCombo->currentData().toString());
+		data.replace("RunConfiguration.WorkingDirectory\">","RunConfiguration.WorkingDirectory\">"+projectDir.absolutePath());
 
 		if(!userFile.open(QIODevice::WriteOnly|QIODevice::Truncate)){qWarning()<<"Impossible d'ouvrir le fichier \""+userFile.fileName()+"\"" ; qApp->exit(EXIT_FAILURE);}
 		userFile.write(data.toUtf8()); userFile.close();
 
 		// Open new project
-		QDesktopServices::openUrl(QUrl("file:///"+dir.absolutePath()+QDir::separator()+dir.dirName()+".pro"));
+		QDesktopServices::openUrl(QUrl("file:///"+srcDir.absolutePath()+QDir::separator()+srcDir.dirName()+".pro"));
 
-		settings->setValue("defaultProjectPath", ui->checkBox->isChecked() ? ui->directoryLineEdit->text() : "");
+		settings->setValue("defaultProjectPath", ui->pathCheckBox->isChecked() ? ui->directoryLineEdit->text() : "");
 		accept();});
 }
 

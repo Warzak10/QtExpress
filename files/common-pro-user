@@ -117,7 +117,8 @@
    </valuemap>
    <value type="int" key="ProjectExplorer.Target.DeployConfigurationCount">1</value>
    <valuemap type="QVariantMap" key="ProjectExplorer.Target.PluginSettings"/>
-   <valuemap type="QVariantMap" key="ProjectExplorer.Target.RunConfiguration.0">    
+   <valuemap type="QVariantMap" key="ProjectExplorer.Target.RunConfiguration.0">
+    <value type="QString" key="RunConfiguration.WorkingDirectory"></value>    
    </valuemap>
    <value type="int" key="ProjectExplorer.Target.RunConfigurationCount">1</value>
   </valuemap>

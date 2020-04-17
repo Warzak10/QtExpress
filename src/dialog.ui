@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>480</width>
-    <height>184</height>
+    <height>209</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -50,7 +50,7 @@
         </layout>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox">
+        <widget class="QCheckBox" name="pathCheckBox">
          <property name="text">
           <string>Utiliser comme emplacement par defaut pour les projets</string>
          </property>
@@ -79,6 +79,16 @@
       <widget class="QComboBox" name="projectKitCombo"/>
      </item>
     </layout>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="srcCheckBox">
+     <property name="text">
+      <string>Créer un sous dossier &quot;src&quot; pour les fichiers sources</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
