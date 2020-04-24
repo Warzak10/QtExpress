@@ -99,24 +99,27 @@ Dialog::Dialog(QWidget *parent) : QDialog(parent), ui(new Ui::Dialog)
 			t->start(2000);return;}
 
 		QDir srcDir(ui->srcCheckBox->isChecked() ? projectDir.absolutePath()+QDir::separator()+"src" : projectDir);
+		QString projectName = ui->projectNameLineEdit->text();
 
 		// Copy corresponding files
 
-		qvariant_cast<Item*>(ui->projectTypeCombo->currentData())->createProject(srcDir);
+		qvariant_cast<Item*>(ui->projectTypeCombo->currentData())->createProject(srcDir,projectName);
 
 		// Edit ".pro.user" file with QtKit selected
-		QFile userFile(srcDir.absolutePath()+QDir::separator()+srcDir.dirName()+".pro.user");
+		QFile userFile(srcDir.absolutePath()+QDir::separator()+projectName+".pro.user");
 		if(!userFile.open(QIODevice::ReadOnly)){qWarning()<<"Impossible d'ouvrir le fichier \""+userFile.fileName()+"\"" ; qApp->exit(EXIT_FAILURE);}
 		QString data = userFile.readAll(); userFile.close();
 
-		data.replace("ProjectConfiguration.Id\">","ProjectConfiguration.Id\">"+ui->projectKitCombo->currentData().toString());
-		data.replace("RunConfiguration.WorkingDirectory\">","RunConfiguration.WorkingDirectory\">"+projectDir.absolutePath());
+		data.replace("ProjectConfiguration.Id\"><","ProjectConfiguration.Id\">"+ui->projectKitCombo->currentData().toString()+"<");
+		data.replace("Qt4RunConfiguration:","Qt4RunConfiguration:"+srcDir.absolutePath()+"/"+projectName+".pro");
+		data.replace("RunConfiguration.BuildKey\"><","RunConfiguration.BuildKey\">"+srcDir.absolutePath()+"/"+projectName+".pro<");
+		data.replace("RunConfiguration.WorkingDirectory\"><","RunConfiguration.WorkingDirectory\">"+projectDir.absolutePath()+"<");
 
 		if(!userFile.open(QIODevice::WriteOnly|QIODevice::Truncate)){qWarning()<<"Impossible d'ouvrir le fichier \""+userFile.fileName()+"\"" ; qApp->exit(EXIT_FAILURE);}
 		userFile.write(data.toUtf8()); userFile.close();
 
 		// Open new project
-		QDesktopServices::openUrl(QUrl("file:///"+srcDir.absolutePath()+QDir::separator()+srcDir.dirName()+".pro"));
+		QDesktopServices::openUrl(QUrl("file:///"+srcDir.absolutePath()+QDir::separator()+projectName+".pro"));
 
 		settings->setValue("defaultProjectPath", ui->pathCheckBox->isChecked() ? ui->directoryLineEdit->text() : "");
 		accept();});
@@ -132,24 +135,24 @@ Item::Item(QObject* parent) : QObject(parent){}
 
 ConsoleAppItem::ConsoleAppItem(QComboBox* box) : Item(box) {box->addItem("Qt Console Application", QVariant::fromValue(this));}
 
-void ConsoleAppItem::createProject(const QDir& dir)
+void ConsoleAppItem::createProject(const QDir& dir, const QString& name)
 {
 	dir.mkpath(dir.absolutePath());
 	QFile::copy("files\\console-main",dir.absolutePath()+QDir::separator()+"main.cpp");
-	QFile::copy("files\\console-pro",dir.absolutePath()+QDir::separator()+dir.dirName()+".pro");
-	QFile::copy("files\\common-pro-user",dir.absolutePath()+QDir::separator()+dir.dirName()+".pro.user");
+	QFile::copy("files\\console-pro",dir.absolutePath()+QDir::separator()+name+".pro");
+	QFile::copy("files\\common-pro-user",dir.absolutePath()+QDir::separator()+name+".pro.user");
 }
 
 //////////////////////////////////////////////
 
 WidgetsAppItem::WidgetsAppItem(QComboBox* box) : Item(box) {box->addItem("Qt Widgets Application", QVariant::fromValue(this));}
 
-void WidgetsAppItem::createProject(const QDir& dir)
+void WidgetsAppItem::createProject(const QDir& dir, const QString& name)
 {
 	dir.mkpath(dir.absolutePath());
 	QFile::copy("files\\widgets-main",dir.absolutePath()+QDir::separator()+"main.cpp");
 	QFile::copy("files\\widgets-mainwindow-h",dir.absolutePath()+QDir::separator()+"mainwindow.h");
 	QFile::copy("files\\widgets-mainwindow-cpp",dir.absolutePath()+QDir::separator()+"mainwindow.cpp");
-	QFile::copy("files\\widgets-pro",dir.absolutePath()+QDir::separator()+dir.dirName()+".pro");
-	QFile::copy("files\\common-pro-user",dir.absolutePath()+QDir::separator()+dir.dirName()+".pro.user");
+	QFile::copy("files\\widgets-pro",dir.absolutePath()+QDir::separator()+name+".pro");
+	QFile::copy("files\\common-pro-user",dir.absolutePath()+QDir::separator()+name+".pro.user");
 }
