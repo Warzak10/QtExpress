@@ -30,7 +30,6 @@ Dialog::Dialog(QWidget *parent) : QDialog(parent), ui(new Ui::Dialog)
 	while(i.hasNext()){
 		QRegularExpressionMatch m = i.next();
 		qtVersions.insert(!m.captured(4).isNull() ? m.captured(4) : m.captured(1), m.captured(2));}
-	qDebug() << qtVersions;
 
 	// Check QtKits //
 
@@ -45,7 +44,6 @@ Dialog::Dialog(QWidget *parent) : QDialog(parent), ui(new Ui::Dialog)
 	while(j.hasNext()){
 		QRegularExpressionMatch m = j.next();
 		qtKits.insert(m.captured(3).replace("%{Qt:Version}",qtVersions.value(m.captured(1))),m.captured(2));}
-	qDebug() << qtKits;
 
 	// UI SETUP //
 
@@ -95,7 +93,7 @@ Dialog::Dialog(QWidget *parent) : QDialog(parent), ui(new Ui::Dialog)
 		QDir projectDir(ui->directoryLineEdit->text()+QDir::separator()+ui->projectNameLineEdit->text());
 		if(projectDir.exists()) {
 			ui->warningLabel->setText("Ce projet exist deja");
-			ui->directoryLineEdit->setStyleSheet("background-color: LightCoral;");
+			ui->projectNameLineEdit->setStyleSheet("background-color: LightCoral;");
 			t->start(2000);return;}
 
 		QDir srcDir(ui->srcCheckBox->isChecked() ? projectDir.absolutePath()+QDir::separator()+"src" : projectDir);
