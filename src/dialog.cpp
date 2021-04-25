@@ -21,25 +21,25 @@ Dialog::Dialog(QWidget *parent) : QDialog(parent), ui(new Ui::Dialog)
 
 	QHash<QString, QString> qtVersions;
 	QFile versionsFile(settings->value("qtSettingsPath").toString()+"/qtversion.xml");
-	if(!versionsFile.open(QIODevice::ReadOnly)){qWarning()<<"Impossible d'ouvrir le fichier \"qtversion.xml\""; std::exit(EXIT_FAILURE);}
+	if(!versionsFile.open(QIODevice::ReadOnly)){qWarning()<<R"(Impossible d'ouvrir le fichier "qtversion.xml")"; std::exit(EXIT_FAILURE);}
 	QString VData = versionsFile.readAll();
 	versionsFile.close();
 
-	QRegularExpression rxv("Id\">(.+?).+?QMakePath\">.+?(\\d+\\.\\d+\\.\\d+).+?(Source\">(.+?)<.+)?Autodetected",QRegularExpression::DotMatchesEverythingOption);
+	QRegularExpression rxv(R"(Id">(\d).+?QMakePath">.+?(\d+\.\d+\.\d+).+?Source">(.*?)<)",QRegularExpression::DotMatchesEverythingOption);
 	QRegularExpressionMatchIterator i = rxv.globalMatch(VData);
 	while(i.hasNext()){
 		QRegularExpressionMatch m = i.next();
-		qtVersions.insert(!m.captured(4).isNull() ? m.captured(4) : m.captured(1), m.captured(2));}
+		qtVersions.insert(!m.captured(3).isEmpty() ? m.captured(3) : m.captured(1), m.captured(2));}
 
 	// Check QtKits //
 
 	QHash<QString, QString> qtKits;
 	QFile kitsFile(settings->value("qtSettingsPath").toString()+"/profiles.xml");
-	if(!kitsFile.open(QIODevice::ReadOnly)){qWarning()<<"Impossible d'ouvrir le fichier \"profiles.xml\""; std::exit(EXIT_FAILURE);}
+	if(!kitsFile.open(QIODevice::ReadOnly)){qWarning()<<R"(Impossible d'ouvrir le fichier "profiles.xml")"; std::exit(EXIT_FAILURE);}
 	QString KData = kitsFile.readAll();
 	kitsFile.close();
 
-	QRegularExpression rxk("QtInformation\">(.+?)<.+?Id\">(.+?)<.+?Name\">(.+?)<",QRegularExpression::DotMatchesEverythingOption);
+	QRegularExpression rxk(R"(QtInformation">(.+?)<.+?Id">(.+?)<.+?Name\">(.+?)<)",QRegularExpression::DotMatchesEverythingOption);
 	QRegularExpressionMatchIterator j = rxk.globalMatch(KData);
 	while(j.hasNext()){
 		QRegularExpressionMatch m = j.next();
