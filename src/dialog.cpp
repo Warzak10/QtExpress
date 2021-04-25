@@ -53,7 +53,8 @@ Dialog::Dialog(QWidget *parent) : QDialog(parent), ui(new Ui::Dialog)
 	ui->directoryLineEdit->setText(settings->value("defaultProjectPath").toString());
 	ui->pathCheckBox->setChecked(!ui->directoryLineEdit->text().isEmpty());
 
-	for(QString k : qtKits.keys()) ui->projectKitCombo->addItem(k, qtKits.value(k));
+	for(auto i = qtKits.begin(); i != qtKits.end(); ++i)
+		ui->projectKitCombo->addItem(i.key(), i.value());
 	new ConsoleAppItem(ui->projectTypeCombo);
 	new WidgetsAppItem(ui->projectTypeCombo);
 
