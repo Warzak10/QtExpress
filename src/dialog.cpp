@@ -60,17 +60,17 @@ Dialog::Dialog(QWidget *parent) : QDialog(parent), ui(new Ui::Dialog)
 	// CONNECTIONS
 
 	QTimer* t = new QTimer(this);
-	connect(t, &QTimer::timeout, [=]{
+	connect(t, &QTimer::timeout, this, [=]{
 		ui->warningLabel->clear();
 		ui->projectNameLineEdit->setStyleSheet("background-color: white;");
 		ui->directoryLineEdit->setStyleSheet("background-color: white;");});
 
 
-	connect(ui->browseButton, &QPushButton::clicked, [=]{
+	connect(ui->browseButton, &QPushButton::clicked, this, [=]{
 		ui->directoryLineEdit->setText(QFileDialog::getExistingDirectory(this,qApp->applicationDisplayName(),qApp->applicationDirPath()));});
 
 	connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
-	connect(ui->buttonBox, &QDialogButtonBox::accepted, [=]{
+	connect(ui->buttonBox, &QDialogButtonBox::accepted, this, [=]{
 
 		// Check user datas
 		if(ui->projectNameLineEdit->text().isEmpty()) {
