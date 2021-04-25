@@ -25,3 +25,5 @@ ui_*.h
 *.rc
 *.lnk
 *.zip
+*.conf
+*.user
