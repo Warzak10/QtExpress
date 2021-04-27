@@ -57,6 +57,7 @@ Dialog::Dialog(QWidget *parent) : QDialog(parent), ui(new Ui::Dialog)
 		ui->projectKitCombo->addItem(i.key(), i.value());
 	new ConsoleAppItem(ui->projectTypeCombo);
 	new WidgetsAppItem(ui->projectTypeCombo);
+	new WidgetsWithUIAppItem(ui->projectTypeCombo);
 
 	// CONNECTIONS
 
@@ -153,5 +154,18 @@ void WidgetsAppItem::createProject(const QDir& dir, const QString& name)
 	QFile::copy("files\\widgets-mainwindow-h",dir.absolutePath()+QDir::separator()+"mainwindow.h");
 	QFile::copy("files\\widgets-mainwindow-cpp",dir.absolutePath()+QDir::separator()+"mainwindow.cpp");
 	QFile::copy("files\\widgets-pro",dir.absolutePath()+QDir::separator()+name+".pro");
+	QFile::copy("files\\common-pro-user",dir.absolutePath()+QDir::separator()+name+".pro.user");
+}
+
+WidgetsWithUIAppItem::WidgetsWithUIAppItem(QComboBox *box) : Item(box) {box->addItem("Qt Widgets with UI Application", QVariant::fromValue(this));}
+
+void WidgetsWithUIAppItem::createProject(const QDir &dir, const QString &name)
+{
+	dir.mkpath(dir.absolutePath());
+	QFile::copy("files\\widgets-main",dir.absolutePath()+QDir::separator()+"main.cpp");
+	QFile::copy("files\\widgets-ui-mainwindow-h",dir.absolutePath()+QDir::separator()+"mainwindow.h");
+	QFile::copy("files\\widgets-ui-mainwindow-cpp",dir.absolutePath()+QDir::separator()+"mainwindow.cpp");
+	QFile::copy("files\\widgets-ui-mainwindow-ui",dir.absolutePath()+QDir::separator()+"mainwindow.ui");
+	QFile::copy("files\\widgets-ui-pro",dir.absolutePath()+QDir::separator()+name+".pro");
 	QFile::copy("files\\common-pro-user",dir.absolutePath()+QDir::separator()+name+".pro.user");
 }

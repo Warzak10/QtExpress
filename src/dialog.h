@@ -41,4 +41,10 @@ struct WidgetsAppItem : public Item
 	WidgetsAppItem(QComboBox* box);
 	virtual void createProject(const QDir& dir, const QString& name);
 };
+
+struct WidgetsWithUIAppItem : public Item
+{
+	WidgetsWithUIAppItem(QComboBox* box);
+	virtual void createProject(const QDir& dir, const QString& name);
+};
 #endif // DIALOG_H
