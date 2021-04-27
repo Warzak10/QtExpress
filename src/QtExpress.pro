@@ -6,11 +6,13 @@ CONFIG += c++11
 DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
+    logger.cpp \
     main.cpp \
     dialog.cpp
 
 HEADERS += \
-    dialog.h
+    dialog.h \
+    logger.h
 
 FORMS += \
     dialog.ui
