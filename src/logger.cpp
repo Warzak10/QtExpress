@@ -11,7 +11,7 @@ Logger::Logger(const QString& file) : m_showDateTime(true)
 	m_stream.setDevice(&m_file);
 	m_stream.setCodec("UTF-8");
 
-	qInstallMessageHandler(messageHandler);
+	qInstallMessageHandler(this->messageHandler);
 }
 
 Logger *Logger::instance()

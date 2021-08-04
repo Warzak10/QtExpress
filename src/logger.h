@@ -16,6 +16,8 @@ class Logger
 
 		Logger(const QString& file);
 		~Logger(){};
+		Logger(const Logger&);
+		Logger& operator=(const Logger&);
 
 		static Logger* instance();
 		static void messageHandler(QtMsgType type, const QMessageLogContext& context, const QString& msg);
