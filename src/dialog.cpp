@@ -138,8 +138,8 @@ ConsoleAppItem::ConsoleAppItem(QComboBox* box) : Item(box) {box->addItem("Qt Con
 void ConsoleAppItem::createProject(const QDir& dir, const QString& name)
 {
 	dir.mkpath(dir.absolutePath());
-	QFile::copy("files\\console-main",dir.absolutePath()+QDir::separator()+"main.cpp");
-	QFile::copy("files\\console-pro",dir.absolutePath()+QDir::separator()+name+".pro");
+	QFile::copy("files\\qtconsole-main",dir.absolutePath()+QDir::separator()+"main.cpp");
+	QFile::copy("files\\qtconsole-pro",dir.absolutePath()+QDir::separator()+name+".pro");
 	QFile::copy("files\\common-pro-user",dir.absolutePath()+QDir::separator()+name+".pro.user");
 }
 
@@ -150,10 +150,10 @@ WidgetsAppItem::WidgetsAppItem(QComboBox* box) : Item(box) {box->addItem("Qt Wid
 void WidgetsAppItem::createProject(const QDir& dir, const QString& name)
 {
 	dir.mkpath(dir.absolutePath());
-	QFile::copy("files\\widgets-main",dir.absolutePath()+QDir::separator()+"main.cpp");
-	QFile::copy("files\\widgets-mainwindow-h",dir.absolutePath()+QDir::separator()+"mainwindow.h");
-	QFile::copy("files\\widgets-mainwindow-cpp",dir.absolutePath()+QDir::separator()+"mainwindow.cpp");
-	QFile::copy("files\\widgets-pro",dir.absolutePath()+QDir::separator()+name+".pro");
+	QFile::copy("files\\qtwidgets-qmainwindow-main",dir.absolutePath()+QDir::separator()+"main.cpp");
+	QFile::copy("files\\qtwidgets-qmainwindow-h",dir.absolutePath()+QDir::separator()+"mainwindow.h");
+	QFile::copy("files\\qtwidgets-qmainwindow-cpp",dir.absolutePath()+QDir::separator()+"mainwindow.cpp");
+	QFile::copy("files\\qtwidgets-qmainwindow-pro",dir.absolutePath()+QDir::separator()+name+".pro");
 	QFile::copy("files\\common-pro-user",dir.absolutePath()+QDir::separator()+name+".pro.user");
 }
 
@@ -162,10 +162,10 @@ WidgetsWithUIAppItem::WidgetsWithUIAppItem(QComboBox *box) : Item(box) {box->add
 void WidgetsWithUIAppItem::createProject(const QDir &dir, const QString &name)
 {
 	dir.mkpath(dir.absolutePath());
-	QFile::copy("files\\widgets-main",dir.absolutePath()+QDir::separator()+"main.cpp");
-	QFile::copy("files\\widgets-ui-mainwindow-h",dir.absolutePath()+QDir::separator()+"mainwindow.h");
-	QFile::copy("files\\widgets-ui-mainwindow-cpp",dir.absolutePath()+QDir::separator()+"mainwindow.cpp");
-	QFile::copy("files\\widgets-ui-mainwindow-ui",dir.absolutePath()+QDir::separator()+"mainwindow.ui");
-	QFile::copy("files\\widgets-ui-pro",dir.absolutePath()+QDir::separator()+name+".pro");
+	QFile::copy("files\\qtwidgets-qmainwindow-main",dir.absolutePath()+QDir::separator()+"main.cpp");
+	QFile::copy("files\\qtwidgets-ui-qmainwindow-h",dir.absolutePath()+QDir::separator()+"mainwindow.h");
+	QFile::copy("files\\qtwidgets-ui-qmainwindow-cpp",dir.absolutePath()+QDir::separator()+"mainwindow.cpp");
+	QFile::copy("files\\qtwidgets-ui-qmainwindow-ui",dir.absolutePath()+QDir::separator()+"mainwindow.ui");
+	QFile::copy("files\\qtwidgets-ui-qmainwindow-pro",dir.absolutePath()+QDir::separator()+name+".pro");
 	QFile::copy("files\\common-pro-user",dir.absolutePath()+QDir::separator()+name+".pro.user");
 }
