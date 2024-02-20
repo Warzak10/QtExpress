@@ -13,14 +13,15 @@ Dialog::Dialog(QWidget *parent) : QDialog(parent), ui(new Ui::Dialog)
 	// Load Settings //
 
 	QString roamingPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-	roamingPath = roamingPath.left(roamingPath.lastIndexOf('/'));
-	QSettings* settings = new QSettings("settings.conf",QSettings::IniFormat);
-	if(!settings->value("qtSettingsPath").isValid()) settings->setValue("qtSettingsPath", roamingPath+"/QtProject/qtcreator");
+	roamingPath = roamingPath.left(roamingPath.lastIndexOf('/'))+"/QtProject/";
+
+	QSettings* settings = new QSettings(roamingPath+"QtCreator.ini",QSettings::IniFormat);
+	QString defaultProjectPath = settings->value("Directories/Projects").toString();
 
 	// Check QtVersions //
 
 	QHash<QString, QString> qtVersions;
-	QFile versionsFile(settings->value("qtSettingsPath").toString()+"/qtversion.xml");
+	QFile versionsFile(roamingPath+"qtcreator/qtversion.xml");
 	if(!versionsFile.open(QIODevice::ReadOnly)){qWarning()<<R"(Impossible d'ouvrir le fichier "qtversion.xml")"; std::exit(EXIT_FAILURE);}
 	QString VData = versionsFile.readAll();
 	versionsFile.close();
@@ -34,7 +35,7 @@ Dialog::Dialog(QWidget *parent) : QDialog(parent), ui(new Ui::Dialog)
 	// Check QtKits //
 
 	QHash<QString, QString> qtKits;
-	QFile kitsFile(settings->value("qtSettingsPath").toString()+"/profiles.xml");
+	QFile kitsFile(roamingPath+"qtcreator/profiles.xml");
 	if(!kitsFile.open(QIODevice::ReadOnly)){qWarning()<<R"(Impossible d'ouvrir le fichier "profiles.xml")"; std::exit(EXIT_FAILURE);}
 	QString KData = kitsFile.readAll();
 	kitsFile.close();
@@ -52,7 +53,7 @@ Dialog::Dialog(QWidget *parent) : QDialog(parent), ui(new Ui::Dialog)
 
 	setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 
-	ui->directoryLineEdit->setText(settings->value("defaultProjectPath").toString());
+	ui->directoryLineEdit->setText(defaultProjectPath);
 	ui->pathCheckBox->setChecked(!ui->directoryLineEdit->text().isEmpty());
 
 	for(auto i = qtKits.begin(); i != qtKits.end(); ++i)
@@ -114,7 +115,8 @@ Dialog::Dialog(QWidget *parent) : QDialog(parent), ui(new Ui::Dialog)
 		QDesktopServices::openUrl(QUrl("file:///"+project));
 
 		if(ui->pathCheckBox->isChecked())
-			settings->setValue("defaultProjectPath", ui->directoryLineEdit->text());
+			if(defaultProjectPath != ui->directoryLineEdit->text())
+				settings->setValue("Directories/Projects", ui->directoryLineEdit->text());
 		accept();
 	});
 }
