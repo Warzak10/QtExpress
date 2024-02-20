@@ -2,11 +2,9 @@
 #define DIALOG_H
 
 #include <QDialog>
-#include <QDir>
 
-class QComboBox;
 
-namespace Ui { class Dialog; }
+namespace Ui {class Dialog;}
 
 class Dialog : public QDialog
 {
@@ -16,35 +14,12 @@ class Dialog : public QDialog
 		Dialog(QWidget *parent = nullptr);
 		~Dialog();
 
+		void warn(QWidget* widget, const QString& text);
+		QString createProject();
+
 	private:
 		Ui::Dialog *ui;
+		QTimer* timer;
 };
 
-//////////////////////////////////////////////////////////
-
-struct Item : public QObject
-{
-	Q_OBJECT
-	public:
-	Item(QObject* parent);
-	virtual void createProject(const QDir& dir, const QString& name) = 0;
-};
-
-struct ConsoleAppItem : public Item
-{
-	ConsoleAppItem(QComboBox* box);
-	virtual void createProject(const QDir& dir, const QString& name);
-};
-
-struct WidgetsAppItem : public Item
-{
-	WidgetsAppItem(QComboBox* box);
-	virtual void createProject(const QDir& dir, const QString& name);
-};
-
-struct WidgetsWithUIAppItem : public Item
-{
-	WidgetsWithUIAppItem(QComboBox* box);
-	virtual void createProject(const QDir& dir, const QString& name);
-};
 #endif // DIALOG_H

@@ -2,6 +2,14 @@
 <ui version="4.0">
  <class>Dialog</class>
  <widget class="QDialog" name="Dialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>480</width>
+    <height>294</height>
+   </rect>
+  </property>
   <property name="minimumSize">
    <size>
     <width>480</width>
@@ -9,53 +17,11 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>QtExpress</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
     <layout class="QFormLayout" name="formLayout">
-     <item row="2" column="1">
-      <widget class="QLineEdit" name="projectNameLineEdit"/>
-     </item>
-     <item row="3" column="0">
-      <widget class="QLabel" name="directoryLabel">
-       <property name="text">
-        <string>Emplacement :</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="projectNameLabel">
-       <property name="text">
-        <string>Nom du projet :</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="1">
-      <layout class="QVBoxLayout" name="verticalLayout">
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout">
-         <item>
-          <widget class="QLineEdit" name="directoryLineEdit"/>
-         </item>
-         <item>
-          <widget class="QPushButton" name="browseButton">
-           <property name="text">
-            <string>Parcourir</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="pathCheckBox">
-         <property name="text">
-          <string>Utiliser comme emplacement par defaut pour les projets</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
      <item row="0" column="0">
       <widget class="QLabel" name="projectTypeLabel">
        <property name="text">
@@ -76,6 +42,81 @@
      <item row="1" column="1">
       <widget class="QComboBox" name="projectKitCombo"/>
      </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="projectNameLabel">
+       <property name="text">
+        <string>Nom du projet :</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QLineEdit" name="projectNameLineEdit"/>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="directoryLabel">
+       <property name="text">
+        <string>Emplacement :</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QLineEdit" name="directoryLineEdit"/>
+       </item>
+       <item>
+        <widget class="QPushButton" name="browseButton">
+         <property name="text">
+          <string>Parcourir</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item row="4" column="1">
+      <widget class="QCheckBox" name="pathCheckBox">
+       <property name="text">
+        <string>Utiliser comme emplacement par defaut pour les projets</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="0">
+      <widget class="QLabel" name="classNameLabel">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string>Nom de la classe :</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="1">
+      <widget class="QLineEdit" name="classNameLineEdit">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="0">
+      <widget class="QLabel" name="baseClassLabel">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string>Classe de base :</string>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="1">
+      <widget class="QComboBox" name="baseClassCombo">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item>
@@ -89,105 +130,23 @@
     </widget>
    </item>
    <item>
+    <widget class="QCheckBox" name="formCheckBox">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string>Générer un formulaire</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="warningLabel"/>
+   </item>
+   <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
-     <item>
-      <widget class="QLabel" name="warningLabel">
-       <property name="palette">
-        <palette>
-         <active>
-          <colorrole role="WindowText">
-           <brush brushstyle="SolidPattern">
-            <color alpha="255">
-             <red>255</red>
-             <green>0</green>
-             <blue>0</blue>
-            </color>
-           </brush>
-          </colorrole>
-          <colorrole role="Text">
-           <brush brushstyle="SolidPattern">
-            <color alpha="255">
-             <red>208</red>
-             <green>208</green>
-             <blue>208</blue>
-            </color>
-           </brush>
-          </colorrole>
-          <colorrole role="PlaceholderText">
-           <brush brushstyle="SolidPattern">
-            <color alpha="128">
-             <red>255</red>
-             <green>0</green>
-             <blue>0</blue>
-            </color>
-           </brush>
-          </colorrole>
-         </active>
-         <inactive>
-          <colorrole role="WindowText">
-           <brush brushstyle="SolidPattern">
-            <color alpha="255">
-             <red>255</red>
-             <green>0</green>
-             <blue>0</blue>
-            </color>
-           </brush>
-          </colorrole>
-          <colorrole role="Text">
-           <brush brushstyle="SolidPattern">
-            <color alpha="255">
-             <red>208</red>
-             <green>208</green>
-             <blue>208</blue>
-            </color>
-           </brush>
-          </colorrole>
-          <colorrole role="PlaceholderText">
-           <brush brushstyle="SolidPattern">
-            <color alpha="128">
-             <red>255</red>
-             <green>0</green>
-             <blue>0</blue>
-            </color>
-           </brush>
-          </colorrole>
-         </inactive>
-         <disabled>
-          <colorrole role="WindowText">
-           <brush brushstyle="SolidPattern">
-            <color alpha="96">
-             <red>164</red>
-             <green>166</green>
-             <blue>168</blue>
-            </color>
-           </brush>
-          </colorrole>
-          <colorrole role="Text">
-           <brush brushstyle="SolidPattern">
-            <color alpha="96">
-             <red>164</red>
-             <green>166</green>
-             <blue>168</blue>
-            </color>
-           </brush>
-          </colorrole>
-          <colorrole role="PlaceholderText">
-           <brush brushstyle="SolidPattern">
-            <color alpha="128">
-             <red>208</red>
-             <green>208</green>
-             <blue>208</blue>
-            </color>
-           </brush>
-          </colorrole>
-         </disabled>
-        </palette>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </item>
      <item>
       <widget class="QDialogButtonBox" name="buttonBox">
        <property name="orientation">
