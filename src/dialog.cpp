@@ -108,7 +108,7 @@ Dialog::Dialog(QWidget *parent) : QDialog(parent), ui(new Ui::Dialog)
 		if(!QRegExp("[\\w-]+").exactMatch(ui->classNameLineEdit->text())) {warn(ui->classNameLineEdit, "Le nom de la classe est invalide"); return;}
 
 		// Creating project
-		QString project =createProject();
+		QString project = createProject();
 		if(project.isEmpty()) return;
 
 		// Open new project
@@ -147,10 +147,10 @@ QString Dialog::createProject()
 	QDir projectDir(ui->directoryLineEdit->text()+QDir::separator()+ui->projectNameLineEdit->text());
 	if(projectDir.exists()) {warn(ui->projectNameLineEdit, "Ce projet existe deja"); return "";}
 
-	QDir srcDir(ui->srcCheckBox->isChecked() ? projectDir.absolutePath()+QDir::separator()+"src" : projectDir);
+	QDir srcDir(ui->srcCheckBox->isChecked() ? projectDir.absolutePath()+"/"+"src" : projectDir);
 	QString projectName = ui->projectNameLineEdit->text();
-	QString userFilePath = srcDir.absolutePath()+QDir::separator()+projectName+".pro.user";
-	QString proFilePath = srcDir.absolutePath()+QDir::separator()+projectName+".pro";
+	QString userFilePath = srcDir.absolutePath()+"/"+projectName+".pro.user";
+	QString proFilePath = srcDir.absolutePath()+"/"+projectName+".pro";
 
 	QDir().mkpath(srcDir.absolutePath());
 	QString data;
