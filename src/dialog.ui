@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>480</width>
-    <height>294</height>
+    <height>313</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -123,6 +123,16 @@
     <widget class="QCheckBox" name="srcCheckBox">
      <property name="text">
       <string>Créer un sous dossier &quot;src&quot; pour les fichiers sources</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="buildCheckBox">
+     <property name="text">
+      <string>Créer un sous dossier &quot;build&quot;</string>
      </property>
      <property name="checked">
       <bool>true</bool>

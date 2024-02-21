@@ -136,6 +136,8 @@ QString Dialog::createProject()
 	// Working variables
 
 	bool isConsoleApp = ui->projectTypeCombo->currentText() == ProjectType::QT_CONSOLE_APP;
+	bool useBuild = ui->buildCheckBox->isChecked();
+	bool useForm = ui->formCheckBox->isChecked();
 	QString baseClass = ui->baseClassCombo->currentText();
 	QString className = ui->classNameLineEdit->text();
 	QString HFileName = className.toLower()+".h";
@@ -143,104 +145,80 @@ QString Dialog::createProject()
 	QString UIFileName = className.toLower()+".ui";
 
 	QDir projectDir(ui->directoryLineEdit->text()+QDir::separator()+ui->projectNameLineEdit->text());
-	if(projectDir.exists()) {warn(ui->projectNameLineEdit, "Ce projet exist deja"); return "";}
+	if(projectDir.exists()) {warn(ui->projectNameLineEdit, "Ce projet existe deja"); return "";}
 
 	QDir srcDir(ui->srcCheckBox->isChecked() ? projectDir.absolutePath()+QDir::separator()+"src" : projectDir);
 	QString projectName = ui->projectNameLineEdit->text();
+	QString userFilePath = srcDir.absolutePath()+QDir::separator()+projectName+".pro.user";
+	QString proFilePath = srcDir.absolutePath()+QDir::separator()+projectName+".pro";
 
 	QDir().mkpath(srcDir.absolutePath());
-	QFile::copy("files\\common-pro-user",srcDir.absolutePath()+QDir::separator()+projectName+".pro.user");
+	QString data;
 
 	// <projectName>.pro.user
+	{
+		QString buildPath = useBuild ? "../build/%{Project:Name}-%{Kit:FileSystemName}-%{BuildConfig:Name}" : "";
+		data = ProjectFile::USER_FILE.arg(ui->projectKitCombo->currentData().toString(),buildPath,proFilePath,projectDir.absolutePath());
 
-	QFile userFile(srcDir.absolutePath()+QDir::separator()+projectName+".pro.user");
-	if(!userFile.open(QIODevice::ReadOnly)){qWarning()<<"Impossible d'ouvrir le fichier \""+userFile.fileName()+"\"" ; qApp->exit(EXIT_FAILURE);}
-	QString data = userFile.readAll(); userFile.close();
-
-	data.replace("ProjectConfiguration.Id\"><","ProjectConfiguration.Id\">"+ui->projectKitCombo->currentData().toString()+"<");
-	data.replace("Qt4RunConfiguration:","Qt4RunConfiguration:"+srcDir.absolutePath()+"/"+projectName+".pro");
-	data.replace("RunConfiguration.BuildKey\"><","RunConfiguration.BuildKey\">"+srcDir.absolutePath()+"/"+projectName+".pro<");
-	data.replace("RunConfiguration.WorkingDirectory\"><","RunConfiguration.WorkingDirectory\">"+projectDir.absolutePath()+"<");
-
-	if(!userFile.open(QIODevice::WriteOnly|QIODevice::Truncate)){qWarning()<<"Impossible d'ouvrir le fichier \""+userFile.fileName()+"\"" ; qApp->exit(EXIT_FAILURE);}
-	userFile.write(data.toUtf8()); userFile.close();
-
+		QFile userFile(userFilePath);
+		if(!userFile.open(QIODevice::WriteOnly|QIODevice::Truncate)){qWarning()<<"Impossible d'ouvrir le fichier \""+userFilePath+"\"" ; qApp->exit(EXIT_FAILURE);}
+		userFile.write(data.toUtf8()); userFile.close();
+	}
 	// <projectName>.pro
+	{
+		QString config = useBuild ? "-= debug_and_release" : "+= debug_and_release debug_and_release_target";
+		QString form = useForm ? QString("\nFORMS += \\\n\t%1\n").arg(UIFileName) : "";
+		QString files = isConsoleApp?"\n" : QString(" \\\n\t%1\n\nHEADERS += \\\n\t%2\n%3").arg(CFileName,HFileName,form);
+		data = ProjectFile::PRO_FILE.arg(isConsoleApp?"-= gui" : "+= widgets",config, files);
 
-	QString code;
-	code += QString("QT %1\n\n").arg(isConsoleApp ? "-= gui" : "+= widgets");
-	code += QString("CONFIG += debug_and_release debug_and_release_target\n\n");
-	code += QString("DEFINES += QT_DEPRECATED_WARNINGS\n\n");
-	code += QString("SOURCES += \\\n\tmain.cpp%1\n\n").arg(!isConsoleApp ? " \\\n\t"+CFileName : "");
-	if(!isConsoleApp) code += QString("HEADERS += \\\n\t%1\n").arg(HFileName);
-	if(!isConsoleApp && ui->formCheckBox->isChecked()) code += QString("\nFORMS += \\\n\t%1\n").arg(UIFileName);
-
-	QFile proFile(srcDir.absolutePath()+QDir::separator()+projectName+".pro");
-	if(!proFile.open(QIODevice::WriteOnly|QIODevice::Truncate)){qWarning()<<"Impossible d'ouvrir le fichier \""+proFile.fileName()+"\"" ; qApp->exit(EXIT_FAILURE);}
-	proFile.write(code.toUtf8()); proFile.close();
-
+		QFile proFile(proFilePath);
+		if(!proFile.open(QIODevice::WriteOnly|QIODevice::Truncate)){qWarning()<<"Impossible d'ouvrir le fichier \""+proFilePath+"\"" ; qApp->exit(EXIT_FAILURE);}
+		proFile.write(data.toUtf8()); proFile.close();
+	}
 	// main.cpp
+	{
+		QString include = isConsoleApp ? "" : QString("#include \"%1\"\n\n").arg(HFileName);
+		QString show = isConsoleApp ? "" :  QString("\t%1 w;\n\tw.show();\n").arg(className);
+		data =  ProjectFile::MAIN_FILE.arg(include,isConsoleApp ? "Core" : "", show);
 
-	code.clear();
-	if(!isConsoleApp) code += QString("#include \"%1\"\n\n").arg(HFileName);
-	code += QString("#include <Q%1Application>\n\n").arg(isConsoleApp ? "Core" : "");
-	code += QString("int main(int argc, char *argv[])\n{\n");
-	code += QString("\tQ%1Application a(argc, argv);\n").arg(isConsoleApp ? "Core" : "");
-	if(!isConsoleApp) code += QString("\t%1 w;\n\tw.show();\n").arg(className);
-	code += QString("\treturn a.exec();\n}\n");
-
-	QFile mainFile(srcDir.absolutePath()+QDir::separator()+"main.cpp");
-	if(!mainFile.open(QIODevice::WriteOnly|QIODevice::Truncate)){qWarning()<<"Impossible d'ouvrir le fichier \""+mainFile.fileName()+"\"" ; qApp->exit(EXIT_FAILURE);}
-	mainFile.write(code.toUtf8()); mainFile.close();
-
+		QFile mainFile(srcDir.absolutePath()+QDir::separator()+"main.cpp");
+		if(!mainFile.open(QIODevice::WriteOnly|QIODevice::Truncate)){qWarning()<<"Impossible d'ouvrir le fichier \""+mainFile.fileName()+"\"" ; qApp->exit(EXIT_FAILURE);}
+		mainFile.write(data.toUtf8()); mainFile.close();
+	}
 	// End if is QT Console App
 
-	if(isConsoleApp) return proFile.fileName();
+	if(isConsoleApp) return proFilePath;
 
 	// <className>.h
+	{
+		data = ProjectFile::CLASS_H_FILE.arg(useForm?"\n\tprivate:\n\t\tUi::%5 *ui;\n":"",useForm?"namespace Ui {class %5;}\n\n":"").arg(className.toUpper(), baseClass, className);
 
-	code.clear();
-	code += QString("#ifndef %1_H\n").arg(className.toUpper());
-	code += QString("#define %1_H\n\n").arg(className.toUpper());
-	code += QString("#include <%1>\n\n").arg(baseClass);
-	if(ui->formCheckBox->isChecked()) code += QString("namespace Ui {class %1;}\n\n").arg(className);
-	code += QString("class %1 : public %2\n{\n\tQ_OBJECT\n\n\tpublic:\n").arg(className, baseClass);
-	code += QString("\t\t%1(QWidget* parent = nullptr);\n\t\t~%1();\n").arg(className);
-	if(ui->formCheckBox->isChecked()) code += QString("\n\tprivate:\n\t\tUi::%1 *ui;\n").arg(className);
-	code += QString("};\n\n#endif // %1_H\n").arg(className.toUpper());
-
-	QFile HFile(srcDir.absolutePath()+QDir::separator()+HFileName);
-	if(!HFile.open(QIODevice::WriteOnly|QIODevice::Truncate)){qWarning()<<"Impossible d'ouvrir le fichier \""+HFile.fileName()+"\"" ; qApp->exit(EXIT_FAILURE);}
-	HFile.write(code.toUtf8()); HFile.close();
-
+		QFile HFile(srcDir.absolutePath()+QDir::separator()+HFileName);
+		if(!HFile.open(QIODevice::WriteOnly|QIODevice::Truncate)){qWarning()<<"Impossible d'ouvrir le fichier \""+HFile.fileName()+"\"" ; qApp->exit(EXIT_FAILURE);}
+		HFile.write(data.toUtf8()); HFile.close();
+	}
 	// <className>.cpp
+	{
+		QString incForm = useForm ? "#include \"ui_%3\"\n" : "";
+		QString constr = useForm ? ", ui(new Ui::%4)\n{\n\tui->setupUi(this);" : "\n{\n";
+		data = ProjectFile::CLASS_C_FILE.arg(incForm,constr).arg(HFileName,className,baseClass,useForm?"\tdelete ui;" : "");
 
-	code.clear();
-	code += QString("#include \"%1\"\n").arg(HFileName);
-	if(ui->formCheckBox->isChecked()) code += QString("#include \"ui_%1\"\n").arg(HFileName);
-	code += QString("\n%1::%1(QWidget* parent) : %2(parent)").arg(className, baseClass);
-	if(ui->formCheckBox->isChecked()) code += QString(", ui(new Ui::%1)\n{\n\tui->setupUi(this);").arg(className);
-	else code += QString("\n{\n");
-	code += QString("\n}\n\n%1::~%1()\n{\n%2\n}\n").arg(className, ui->formCheckBox->isChecked() ? "\tdelete ui;" : "");
-
-	QFile CFile(srcDir.absolutePath()+QDir::separator()+CFileName);
-	if(!CFile.open(QIODevice::WriteOnly|QIODevice::Truncate)){qWarning()<<"Impossible d'ouvrir le fichier \""+CFile.fileName()+"\"" ; qApp->exit(EXIT_FAILURE);}
-	CFile.write(code.toUtf8()); CFile.close();
-
+		QFile CFile(srcDir.absolutePath()+QDir::separator()+CFileName);
+		if(!CFile.open(QIODevice::WriteOnly|QIODevice::Truncate)){qWarning()<<"Impossible d'ouvrir le fichier \""+CFile.fileName()+"\"" ; qApp->exit(EXIT_FAILURE);}
+		CFile.write(data.toUtf8()); CFile.close();
+	}
 	// <className>.ui
+	{
+		QString centWidget = baseClass==BaseClass::QMAINWINDOW ? ""
+			"  <widget class=\"QWidget\" name=\"centralwidget\"/>\n"
+			"  <widget class=\"QMenuBar\" name=\"menubar\"/>\n"
+			"  <widget class=\"QStatusBar\" name=\"statusbar\"/>\n":"";
+		data = ProjectFile::CLASS_UI_FILE.arg(className,baseClass,centWidget);
 
-	code.clear();
-	code += QString("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<ui version=\"4.0\">\n");
-	code += QString(" <class>%1</class>\n <widget class=\"%2\" name=\"%1\">\n").arg(className, baseClass);
-	code += QString("  <property name=\"geometry\">\n   <rect>\n    <x>0</x>\n    <y>0</y>\n    <width>800</width>\n    <height>600</height>\n   </rect>\n");
-	code += QString("  </property>\n  <property name=\"windowTitle\">\n   <string>%1</string>\n  </property>\n").arg(className);
-	if(baseClass == BaseClass::QMAINWINDOW)
-		code += QString("  <widget class=\"QWidget\" name=\"centralwidget\"/>\n  <widget class=\"QMenuBar\" name=\"menubar\"/>\n  <widget class=\"QStatusBar\" name=\"statusbar\"/>\n");
-	code += QString("  </widget>\n <resources/>\n <connections/>\n</ui>\n");
+		QFile UIFile(srcDir.absolutePath()+QDir::separator()+UIFileName);
+		if(!UIFile.open(QIODevice::WriteOnly|QIODevice::Truncate)){qWarning()<<"Impossible d'ouvrir le fichier \""+UIFile.fileName()+"\"" ; qApp->exit(EXIT_FAILURE);}
+		UIFile.write(data.toUtf8()); UIFile.close();
+	}
 
-	QFile UIFile(srcDir.absolutePath()+QDir::separator()+UIFileName);
-	if(!UIFile.open(QIODevice::WriteOnly|QIODevice::Truncate)){qWarning()<<"Impossible d'ouvrir le fichier \""+UIFile.fileName()+"\"" ; qApp->exit(EXIT_FAILURE);}
-	UIFile.write(code.toUtf8()); UIFile.close();
-
-	return proFile.fileName();
+	return proFilePath;
 }
