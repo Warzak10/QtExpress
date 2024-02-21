@@ -161,7 +161,7 @@ QString Dialog::createProject()
 		data = ProjectFile::USER_FILE.arg(ui->projectKitCombo->currentData().toString(),buildPath,proFilePath,projectDir.absolutePath());
 
 		QFile userFile(userFilePath);
-		if(!userFile.open(QIODevice::WriteOnly|QIODevice::Truncate)){qWarning()<<"Impossible d'ouvrir le fichier \""+userFilePath+"\"" ; qApp->exit(EXIT_FAILURE);}
+		if(!userFile.open(QIODevice::WriteOnly|QIODevice::Truncate)){qCritical()<<"Impossible d'ouvrir le fichier \""+userFilePath+"\"" ; std::exit(EXIT_FAILURE);}
 		userFile.write(data.toUtf8()); userFile.close();
 	}
 	// <projectName>.pro
@@ -172,7 +172,7 @@ QString Dialog::createProject()
 		data = ProjectFile::PRO_FILE.arg(isConsoleApp?"-= gui" : "+= widgets",config, files);
 
 		QFile proFile(proFilePath);
-		if(!proFile.open(QIODevice::WriteOnly|QIODevice::Truncate)){qWarning()<<"Impossible d'ouvrir le fichier \""+proFilePath+"\"" ; qApp->exit(EXIT_FAILURE);}
+		if(!proFile.open(QIODevice::WriteOnly|QIODevice::Truncate)){qCritical()<<"Impossible d'ouvrir le fichier \""+proFilePath+"\"" ; std::exit(EXIT_FAILURE);}
 		proFile.write(data.toUtf8()); proFile.close();
 	}
 	// main.cpp
@@ -182,7 +182,7 @@ QString Dialog::createProject()
 		data =  ProjectFile::MAIN_FILE.arg(include,isConsoleApp ? "Core" : "", show);
 
 		QFile mainFile(srcDir.absolutePath()+QDir::separator()+"main.cpp");
-		if(!mainFile.open(QIODevice::WriteOnly|QIODevice::Truncate)){qWarning()<<"Impossible d'ouvrir le fichier \""+mainFile.fileName()+"\"" ; qApp->exit(EXIT_FAILURE);}
+		if(!mainFile.open(QIODevice::WriteOnly|QIODevice::Truncate)){qCritical()<<"Impossible d'ouvrir le fichier \""+mainFile.fileName()+"\""; std::exit(EXIT_FAILURE);}
 		mainFile.write(data.toUtf8()); mainFile.close();
 	}
 	// End if is QT Console App
@@ -194,7 +194,7 @@ QString Dialog::createProject()
 		data = ProjectFile::CLASS_H_FILE.arg(useForm?"\n\tprivate:\n\t\tUi::%5 *ui;\n":"",useForm?"namespace Ui {class %5;}\n\n":"").arg(className.toUpper(), baseClass, className);
 
 		QFile HFile(srcDir.absolutePath()+QDir::separator()+HFileName);
-		if(!HFile.open(QIODevice::WriteOnly|QIODevice::Truncate)){qWarning()<<"Impossible d'ouvrir le fichier \""+HFile.fileName()+"\"" ; qApp->exit(EXIT_FAILURE);}
+		if(!HFile.open(QIODevice::WriteOnly|QIODevice::Truncate)){qCritical()<<"Impossible d'ouvrir le fichier \""+HFile.fileName()+"\"";std::exit(EXIT_FAILURE);}
 		HFile.write(data.toUtf8()); HFile.close();
 	}
 	// <className>.cpp
@@ -204,7 +204,7 @@ QString Dialog::createProject()
 		data = ProjectFile::CLASS_C_FILE.arg(incForm,constr).arg(HFileName,className,baseClass,useForm?"\tdelete ui;" : "");
 
 		QFile CFile(srcDir.absolutePath()+QDir::separator()+CFileName);
-		if(!CFile.open(QIODevice::WriteOnly|QIODevice::Truncate)){qWarning()<<"Impossible d'ouvrir le fichier \""+CFile.fileName()+"\"" ; qApp->exit(EXIT_FAILURE);}
+		if(!CFile.open(QIODevice::WriteOnly|QIODevice::Truncate)){qCritical()<<"Impossible d'ouvrir le fichier \""+CFile.fileName()+"\""; std::exit(EXIT_FAILURE);}
 		CFile.write(data.toUtf8()); CFile.close();
 	}
 	// <className>.ui
@@ -216,7 +216,7 @@ QString Dialog::createProject()
 		data = ProjectFile::CLASS_UI_FILE.arg(className,baseClass,centWidget);
 
 		QFile UIFile(srcDir.absolutePath()+QDir::separator()+UIFileName);
-		if(!UIFile.open(QIODevice::WriteOnly|QIODevice::Truncate)){qWarning()<<"Impossible d'ouvrir le fichier \""+UIFile.fileName()+"\"" ; qApp->exit(EXIT_FAILURE);}
+		if(!UIFile.open(QIODevice::WriteOnly|QIODevice::Truncate)){qCritical()<<"Impossible d'ouvrir le fichier \""+UIFile.fileName()+"\""; std::exit(EXIT_FAILURE);}
 		UIFile.write(data.toUtf8()); UIFile.close();
 	}
 
