@@ -1,6 +1,6 @@
 QT += core gui widgets
 
-CONFIG += debug_and_release debug_and_release_target
+CONFIG -= debug_and_release
 CONFIG += c++11
 
 DEFINES += QT_DEPRECATED_WARNINGS
